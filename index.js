@@ -47,7 +47,7 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-redditAPI.getAllPostsForUser({}, function(err, result){
+redditAPI.getAllPostsForUser(3, {}, function(err, result){
   if (err ){
     console.log(err);
   }

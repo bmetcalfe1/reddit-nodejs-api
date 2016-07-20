@@ -139,9 +139,10 @@ module.exports = function RedditAPI(conn) {
           SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
           users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt 
           FROM posts JOIN users ON posts.userId = users.id 
+          WHERE users.id = ?
           ORDER BY posts.createdAt DESC
           LIMIT ? OFFSET ?`
-          , [limit, offset],
+          , [userId, limit, offset],
           function(err, results) {
             if (err) {
               callback(err);

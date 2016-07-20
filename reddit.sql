@@ -44,3 +44,9 @@ ALTER TABLE posts
   ADD COLUMN subredditId INT, 
   ADD FOREIGN KEY (subredditId) REFERENCES `subreddits` (`id`) ON DELETE SET NULL;
 
+-- Step 3:
+
+-- In the reddit.js API, add a createSubreddit(sub, callback) function. 
+--It should take a subreddit object which contains a name and optional description property. 
+--It should insert the new subreddit, and either return an error or the newly created subreddit. 
+-- You can take some inspiration from the createPost function which operates in a similar way :)

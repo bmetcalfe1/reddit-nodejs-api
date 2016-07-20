@@ -56,8 +56,17 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-redditAPI.getSinglePost(21, function(err, result){ // 3 now but its whatever you wanna pass it
-  if (err ){
+// redditAPI.getSinglePost(21, function(err, result){ // 3 now but its whatever you wanna pass it
+//   if (err ){
+//     console.log(err);
+//   }
+//   else {
+//     console.log(result);
+//   }
+// });
+
+redditAPI.createSubreddit({name: "DJ Khaled", description: "we the greatest music"}, function(err, result){ // 3 now but its whatever you wanna pass it
+  if (err) {
     console.log(err);
   }
   else {

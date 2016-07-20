@@ -168,6 +168,36 @@ module.exports = function RedditAPI(conn) {
             }
           }
         );
+    },
+    getSinglePost: function(postId, callback) {
+        conn.query(`
+          SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
+          users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt 
+          FROM posts JOIN users ON posts.userId = users.id 
+          WHERE posts.id = ?
+          ORDER BY posts.createdAt DESC`
+          , [postId],
+          function(err, results) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              var mappedReddit = results.map(function(item){
+                return {
+                  post: {
+                    id: item.id,
+                    title: item.title,
+                    url: item.url,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                    userId: item.userId
+                  }
+                };
+              });
+              callback(null, mappedReddit);
+            }
+          }
+        );
     }
   };
 };

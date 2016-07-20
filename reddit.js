@@ -225,6 +225,31 @@ module.exports = function RedditAPI(conn) {
             }
           }
       ); 
+    },
+    getAllSubreddits: function(callback) {
+      conn.query(`
+        SELECT *
+        FROM subreddits
+        ORDER BY subreddits.createdAt`
+        ,
+        function(err, results) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            var mappedReddit = results.map(function(item){
+              return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                createdAt: item.createdAt,
+                updatedAt: item.updatedAt
+              };
+            });
+          }
+          callback(mappedReddit);
+        }
+      );
     }
   };
 };

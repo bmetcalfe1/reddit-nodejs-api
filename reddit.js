@@ -126,6 +126,47 @@ module.exports = function RedditAPI(conn) {
           }
         }
       );
+    },
+    getAllPostsForUser: function(userId, options, callback) {
+      if (!callback) {
+          callback = options;
+          options = {};
+        }
+        var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
+        var offset = (options.page || 0) * limit;
+        
+        conn.query(`
+          SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
+          users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt 
+          FROM posts JOIN users ON posts.userId = users.id 
+          ORDER BY posts.createdAt DESC
+          LIMIT ? OFFSET ?`
+          , [limit, offset],
+          function(err, results) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              var mappedReddit = results.map(function(item){
+                return {
+                  id: item.u_userId,
+                  username: item.u_username,
+                  createdAt: item.u_createdAt,
+                  updatedAt: item.u_updatedAt,
+                  post: {
+                    id: item.id,
+                    title: item.title,
+                    url: item.url,
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                    userId: item.userId
+                  }
+                };
+              });
+              callback(null, mappedReddit);
+            }
+          }
+        );
     }
-  }
-}
+  };
+};

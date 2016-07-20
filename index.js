@@ -38,7 +38,16 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-redditAPI.getAllPosts({}, function(err, result){
+// redditAPI.getAllPosts({}, function(err, result){
+//   if (err ){
+//     console.log(err);
+//   }
+//   else {
+//     console.log(result);
+//   }
+// });
+
+redditAPI.getAllPostsForUser({}, function(err, result){
   if (err ){
     console.log(err);
   }

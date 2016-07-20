@@ -24,10 +24,23 @@ CREATE TABLE `posts` (
   CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- CREATE TABLE `subreddits` (
---   `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
---   `name` VARCHAR(30) NOT NULL UNIQUE KEY,
---   `description` VARCHAR(200) DEFAULT NULL,
---   `createdAt` DATETIME NOT NULL,
---   `updatedAt` DATETIME NOT NULL,
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- STEP 1 
+
+CREATE TABLE `subreddits` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(30) NOT NULL UNIQUE KEY,
+  `description` VARCHAR(200) DEFAULT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- STEP 2
+
+-- Then we need to add a subredditId column to the posts table, with associated foreign key. 
+-- Once you figure out the correct ALTER TABLE statement, make sure to add it to reddit.sql with a comment.
+
+ALTER TABLE posts 
+  ADD COLUMN subredditId INT, 
+  ADD FOREIGN KEY (subredditId) REFERENCES `subreddits` (`id`) ON DELETE SET NULL;
+

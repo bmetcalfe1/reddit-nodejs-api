@@ -38,14 +38,14 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-redditAPI.getAllPosts({}, function(err, result){
-  if (err ){
-    console.log(err);
-  }
-  else {
-    console.log(result);
-  }
-});
+// redditAPI.getAllPosts({}, function(err, result){
+//   if (err ){
+//     console.log(err);
+//   }
+//   else {
+//     console.log(result);
+//   }
+// });
 
 // redditAPI.getAllPostsForUser(3, {}, function(err, result){ // 3 now but its whatever you wanna pass it
 //   if (err ){
@@ -95,3 +95,27 @@ redditAPI.getAllPosts({}, function(err, result){
 //         console.log(post);
 //       }
 //     });
+
+// redditAPI.createComment({
+//   text: "new comment yay!",
+//   userId: 3,
+//   postId: 200,
+//   parentId: null
+//   }, function(err, result){
+//     if (err ){
+//       console.log(err);
+//     }
+//     else {
+//       console.log(result);
+//     }
+// });
+
+redditAPI.getCommentsForPost(1, function(err, result){
+  if (err){
+    console.log(err);
+  }
+  else {
+    console.log(result);
+  }
+});
+

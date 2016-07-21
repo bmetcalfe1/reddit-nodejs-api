@@ -69,10 +69,10 @@ CREATE TABLE `comments` (
   `text` VARCHAR(10000) NOT NULL,
   `createdAt` DATETIME NOT NULL,
   `updatedAt` TIMESTAMP NOT NULL,
-  `userId` INT(11) DEFAULT NULL,
-  `postId` INT(11) DEFAULT NULL,
+  `userId` INT(11) NOT NULL,
+  `postId` INT(11) NOT NULL,
   `parentId` INT(11) DEFAULT NULL,
-  FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL,
-  FOREIGN KEY (`postId`) REFERENCES `posts` (`id`) ON DELETE SET NULL,
-  FOREIGN KEY (`parentId`) REFERENCES `comments` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+  FOREIGN KEY (`postId`) REFERENCES `posts` (`id`),
+  FOREIGN KEY (`parentId`) REFERENCES `comments` (`id`)
+);

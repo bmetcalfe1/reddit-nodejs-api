@@ -259,6 +259,61 @@ module.exports = function RedditAPI(conn) {
           callback(mappedReddit);
         }
       );
-    }
+    },
+    createComment: function(comment, callback){
+      conn.query(
+        'INSERT INTO comments (text, userId, postId, parentId) VALUES (?, ?, ?, ?)', [comment.text, comment.userId, comment.postId, comment.parentId],
+        function(err, result) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            conn.query(
+              'SELECT text, userId, postId, parentId FROM comments WHERE id = ?', [result.insertId],
+              function(err, result) {
+                if (err) {
+                  callback(err);
+                }
+                else {
+                  callback(null, result[0]);
+                }
+              }
+            );
+          }
+        }
+      );
+    },
+//     getCommentsForPost: function(postId, callback){
+//     conn.query(`
+//         SELECT comments.id, comments.text, comments.createdAt, comments.updatedAt
+//         FROM comments
+//         LEFT JOIN comments ON comments.Id = comments.parentId
+//         WHERE comments.id = ?
+//         ORDER BY comments.createdAt`
+//         , [postId],
+//         function(err, results) {
+//           if (err) {
+//             callback(err);
+//           }
+//           else {
+//             var mappedReddit = results.map(function(item){
+//               return {
+//                 id: item.id,
+//                 text: item.text,
+//                 createdAt: item.createdAt,
+//                 updatedAt: item.updatedAt,
+//                 replies: {
+//                     id: item.id,
+//                     text: item.text,
+//                     createdAt: item.createdAt,
+//                     updatedAt: item.updatedAt
+//                   }
+//               };
+//             });
+//           }
+//           callback(mappedReddit);
+//         }
+//       );
+//     }
   };
 };

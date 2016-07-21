@@ -96,13 +96,14 @@ module.exports = function RedditAPI(conn) {
       
       conn.query(`
         SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
-        users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt 
+        users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt,
+        subreddits.id AS s_id, subreddits.name AS s_name, subreddits.createdAt AS s_createdAt, subreddits.updatedAt AS s_updatedAt
         FROM posts 
         JOIN users ON posts.userId = users.id
-        JOIN subreddits s ON posts.subredditId = s.Id
+        JOIN subreddits ON posts.subredditId = subreddits.id
         ORDER BY createdAt DESC
         LIMIT ? OFFSET ?`
-        , [limit, offset],
+        , [limit, offset], // add a where after join?
         function(err, results) {
           if (err) {
             callback(err);

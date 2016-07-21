@@ -50,3 +50,29 @@ ALTER TABLE posts
 --It should take a subreddit object which contains a name and optional description property. 
 --It should insert the new subreddit, and either return an error or the newly created subreddit. 
 -- You can take some inspiration from the createPost function which operates in a similar way :)
+
+
+-- Add comments functionality
+-- Step 1:
+
+-- The first step will be to create a comments table. 
+--  Each comment should have a unique, auto incrementing id and a text anywhere from 1 to 10000 characters. 
+-- It should also have createdAt and updatedAt timestamps that you can copy from an existing table. 
+--  Each comment should also have a userId linking it to the user who created the comment (using a foreign key), 
+-- a postId linking it to the post which is being commented on, and a parentId linking it to the comment it is replying to. 
+-- A top-level comment should have parentId set to NULL.
+
+-- Once you figure out the correct CREATE TABLE statement, add it to reddit.sql with a comment.
+
+CREATE TABLE `comments` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `text` VARCHAR(10000) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` TIMESTAMP NOT NULL,
+  `userId` INT(11) DEFAULT NULL,
+  `postId` INT(11) DEFAULT NULL,
+  `parentId` INT(11) DEFAULT NULL,
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`postId`) REFERENCES `posts` (`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`parentId`) REFERENCES `comments` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

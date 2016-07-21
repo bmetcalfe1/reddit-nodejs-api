@@ -58,9 +58,9 @@ module.exports = function RedditAPI(conn) {
         }
       });
     },
-    createPost: function(post, callback) {
+    createPost: function(post, subredditId, callback) {
       conn.query(
-        'INSERT INTO posts (userId, title, url, createdAt) VALUES (?, ?, ?, ?)', [post.userId, post.title, post.url, new Date()],
+        'INSERT INTO posts (userId, title, url, subredditId, createdAt) VALUES (?, ?, ?, ?, ?)', [post.userId, post.title, post.url, subredditId, new Date()], //add subreddit id to insert
         function(err, result) {
           if (err) {
             callback(err);
@@ -71,7 +71,7 @@ module.exports = function RedditAPI(conn) {
             the post and send it to the caller!
             */
             conn.query(
-              'SELECT id,title,url,userId, createdAt, updatedAt FROM posts WHERE id = ?', [result.insertId],
+              'SELECT id, title, url, userId, createdAt, updatedAt FROM posts WHERE id = ?', [result.insertId], // do a join here?
               function(err, result) {
                 if (err) {
                   callback(err);
@@ -97,8 +97,10 @@ module.exports = function RedditAPI(conn) {
       conn.query(`
         SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
         users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt 
-        FROM posts JOIN users ON posts.userId = users.id 
-        ORDER BY posts.createdAt DESC
+        FROM posts 
+        JOIN users ON posts.userId = users.id
+        JOIN subreddits s ON posts.subredditId = s.Id
+        ORDER BY createdAt DESC
         LIMIT ? OFFSET ?`
         , [limit, offset],
         function(err, results) {
@@ -119,6 +121,12 @@ module.exports = function RedditAPI(conn) {
                   username: item.u_username,
                   createdAt: item.u_createdAt,
                   updatedAt: item.u_updatedAt
+                },
+                subreddit: {
+                  id: item.s_id,
+                  username: item.s_name,
+                  createdAt: item.s_createdAt,
+                  updatedAt: item.s_updatedAt
                 }
               };
             });

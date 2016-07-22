@@ -120,7 +120,7 @@ var redditAPI = reddit(connection);
 // });
 
 redditAPI.createOrUpdateVote({
-  vote: 3,
+  vote: 1,
   userId: 1,
   postId: 1,
   }, function(err, result){

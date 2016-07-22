@@ -338,33 +338,33 @@ module.exports = function RedditAPI(conn) {
       );
     },
     createOrUpdateVote: function(vote, callback){
-      if (vote.vote !== 1 && vote.vote !== 0 && vote.vote !==-1) {
-          console.log(vote.vote);
-          console.log("This is not a valid input");
-          callback("Vote must be 1, 0, or -1");
-          return;
-      }          
-      conn.query(
-        'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `vote`= ?;', [vote.vote, vote.userId, vote.postId],
-        function(err, result) {
-          if (err) {
-            callback(err);
-          }
-          else {
-            conn.query(
-              'SELECT text, userId, postId FROM comments WHERE id = ?', [result.insertId],
-              function(err, result) {
-                if (err) {
-                  callback(err);
+      if (vote.vote === 1 || vote.vote === 0 || vote.vote === -1) {
+        conn.query(
+          'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `vote`= ?;', [vote.vote, vote.userId, vote.postId],
+          function(err, result) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              conn.query(
+                'SELECT text, userId, postId FROM comments WHERE id = ?', [result.insertId],
+                function(err, result) {
+                  if (err) {
+                    callback(err);
+                  }
+                  else {
+                    callback(null, result[0]);
+                  }
                 }
-                else {
-                  callback(null, result[0]);
-                }
-              }
-            );
+              );
+            }
           }
-        }
-      );
-    },
+        );
+      }
+      else {
+        console.log("Not a valid input");
+        return;
+      }
+    }          
   };
 };

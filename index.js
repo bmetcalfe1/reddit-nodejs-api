@@ -98,8 +98,8 @@ var redditAPI = reddit(connection);
 
 // redditAPI.createComment({
 //   text: "new comment yay!",
-//   userId: 3,
-//   postId: 200,
+//   userId: 7,
+//   postId: 1,
 //   parentId: null
 //   }, function(err, result){
 //     if (err ){
@@ -110,12 +110,25 @@ var redditAPI = reddit(connection);
 //     }
 // });
 
-redditAPI.getCommentsForPost(1, function(err, result){
-  if (err){
-    console.log(err);
-  }
-  else {
-    console.log(result);
-  }
+// redditAPI.getCommentsForPost(1, function(err, result){
+//   if (err){
+//     console.log(err);
+//   }
+//   else {
+//     console.log(result);
+//   }
+// });
+
+redditAPI.createOrUpdateVote({
+  vote: 3,
+  userId: 1,
+  postId: 1,
+  }, function(err, result){
+    if (err ){
+      console.log(err);
+    }
+    else {
+      console.log(result);
+    }
 });
 

@@ -283,37 +283,88 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-//     getCommentsForPost: function(postId, callback){
-//     conn.query(`
-//         SELECT comments.id, comments.text, comments.createdAt, comments.updatedAt
-//         FROM comments
-//         LEFT JOIN comments ON comments.Id = comments.parentId
-//         WHERE comments.id = ?
-//         ORDER BY comments.createdAt`
-//         , [postId],
-//         function(err, results) {
-//           if (err) {
-//             callback(err);
-//           }
-//           else {
-//             var mappedReddit = results.map(function(item){
-//               return {
-//                 id: item.id,
-//                 text: item.text,
-//                 createdAt: item.createdAt,
-//                 updatedAt: item.updatedAt,
-//                 replies: {
-//                     id: item.id,
-//                     text: item.text,
-//                     createdAt: item.createdAt,
-//                     updatedAt: item.updatedAt
-//                   }
-//               };
-//             });
-//           }
-//           callback(mappedReddit);
-//         }
-//       );
-//     }
+    getCommentsForPost: function(postId, callback){
+    conn.query(`
+        SELECT c1.id AS c1_id, c1.text AS c1_text, c1.createdAt AS c1_createdAt, c1.updatedAt AS c1_updatedAt, 
+        c2.id AS c2_id, c2.text AS c2_text, c2.createdAt AS c2_createdAt, c2.updatedAt AS c2_updatedAt
+        FROM comments c1
+        LEFT JOIN comments c2 ON c1.id = c2.parentId
+        WHERE c1.parentId IS NULL AND c1.postId = ?
+        ORDER BY c1_createdAt` 
+        , [postId],
+        function(err, results) { 
+        // console.log(results); // TEST. At this point all results print non-nested
+          if (err) {
+            callback(err);
+          }
+          else {
+            
+            var answerComments = [];
+            
+            
+            var mappedReddit = results.forEach(function(item){
+              // create 2 objects:
+              // 1: var c1 = {} n var c2 = {}
+              // 2 add c1 to comment array only if new
+              // if c2.id is not NULL, add c2 to replies of c1 wih a push
+              
+              if (item.parentId === null) {
+                  answerComments.push(item);
+              }
+              else if (item.parentId !== null) {
+                  c1.replies.push(item);
+              }
+              
+              var c1 = {
+                id: item.c1_id,
+                text: item.c1_text,
+                parentId: item.c1_parentId,
+                replies: []
+              };
+              var c2 = {
+                id: item.c2_id,
+                text: item.c2_text,
+                parentId: item.c2_parentId,
+                replies: []
+              };
+              
+              // do a console.log here to test
+              
+              console.log(answerComments);
+            });
+          }
+          return callback(null, mappedReddit);
+        }
+      );
+    },
+    createOrUpdateVote: function(vote, callback){
+      if (vote.vote !== 1 && vote.vote !== 0 && vote.vote !==-1) {
+          console.log(vote.vote);
+          console.log("This is not a valid input");
+          callback("Vote must be 1, 0, or -1");
+          return;
+      }          
+      conn.query(
+        'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `vote`= ?;', [vote.vote, vote.userId, vote.postId],
+        function(err, result) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            conn.query(
+              'SELECT text, userId, postId FROM comments WHERE id = ?', [result.insertId],
+              function(err, result) {
+                if (err) {
+                  callback(err);
+                }
+                else {
+                  callback(null, result[0]);
+                }
+              }
+            );
+          }
+        }
+      );
+    },
   };
 };

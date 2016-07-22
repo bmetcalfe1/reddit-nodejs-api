@@ -76,3 +76,14 @@ CREATE TABLE `comments` (
   FOREIGN KEY (`postId`) REFERENCES `posts` (`id`),
   FOREIGN KEY (`parentId`) REFERENCES `comments` (`id`)
 );
+
+CREATE TABLE votes (
+  userId INT(11) NOT NULL,
+  postId INT(11) NOT NULL,
+  PRIMARY KEY (userId, postId),
+  vote TINYINT DEFAULT NULL,
+  createdAt DATETIME NOT NULL,
+  updatedAt TIMESTAMP NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users (id),
+  FOREIGN KEY (postId) REFERENCES posts (id)
+);

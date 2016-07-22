@@ -85,7 +85,7 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-    getAllPosts: function(options, callback) {
+    getAllPosts: function(sortingMethod, options, callback) {
       // In case we are called without an options parameter, shift all the parameters manually
       if (!callback) {
         callback = options;
@@ -94,17 +94,27 @@ module.exports = function RedditAPI(conn) {
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
       
-      conn.query(`
-        SELECT posts.id, posts.title, posts.url, posts.userId, posts.createdAt, posts.updatedAt,
-        users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt,
-        subreddits.id AS s_id, subreddits.name AS s_name, subreddits.createdAt AS s_createdAt, subreddits.updatedAt AS s_updatedAt
-        FROM posts 
-        JOIN users ON posts.userId = users.id
-        JOIN subreddits ON posts.subredditId = subreddits.id
-        LEFT JOIN votes ON posts.id = votes.postId
-        ORDER BY createdAt DESC
-        LIMIT ? OFFSET ?`
-        , [limit, offset], // add a where after join?
+      conn.query(
+        `
+        SELECT 
+          posts.id AS p_id, posts.title AS p_title, posts.url AS p_url, posts.userId AS p_userId,
+          posts.createdAt AS p_createdAt, posts.updatedAt AS p_updatedAt, posts.subredditId AS p_subredditId,
+          users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt,
+          subreddits.id AS s_id, subreddits.name AS s_name, subreddits.createdAt AS s_createdAt, subreddits.updatedAt AS s_updatedAt
+        FROM 
+          posts 
+        JOIN 
+          users ON posts.userId = users.id
+        JOIN 
+          subreddits ON posts.subredditId = subreddits.id
+        LEFT JOIN 
+          votes ON posts.id = votes.postId
+        GROUP BY 
+          posts.id
+          
+        LIMIT ? OFFSET ?
+        `
+        , [limit, offset], // SUM votes.vote AS voteScore
         function(err, results) {
           if (err) {
             callback(err);
@@ -112,6 +122,7 @@ module.exports = function RedditAPI(conn) {
           else {
             var mappedReddit = results.map(function(item){
               return {
+                //voteScore: item.voteScore,
                 id: item.id,
                 title: item.title,
                 url: item.url,
@@ -129,7 +140,8 @@ module.exports = function RedditAPI(conn) {
                   username: item.s_name,
                   createdAt: item.s_createdAt,
                   updatedAt: item.s_updatedAt
-                }
+                },
+                
               };
             });
             callback(null, mappedReddit);

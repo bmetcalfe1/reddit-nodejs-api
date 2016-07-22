@@ -120,9 +120,9 @@ var redditAPI = reddit(connection);
 // });
 
 redditAPI.createOrUpdateVote({
-  vote: -1,
-  userId: 1,
-  postId: 1,
+  vote: 0,
+  userId: 5,
+  postId: 6,
   }, function(err, result){
     if (err ){
       console.log(err);

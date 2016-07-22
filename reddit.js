@@ -349,7 +349,7 @@ module.exports = function RedditAPI(conn) {
             }
             else {
               conn.query(
-                'SELECT vote, userId, postId FROM votes WHERE postId = ? AND userId = ?', [vote.userId, vote.postId],
+                'SELECT vote, userId, postId FROM votes WHERE postId = ? AND userId = ?', [vote.postId, vote.userId],
                 function(err, result) {
                   if (err) {
                     callback(err);

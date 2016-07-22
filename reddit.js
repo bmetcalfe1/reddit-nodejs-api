@@ -101,6 +101,7 @@ module.exports = function RedditAPI(conn) {
         FROM posts 
         JOIN users ON posts.userId = users.id
         JOIN subreddits ON posts.subredditId = subreddits.id
+        LEFT JOIN votes ON posts.id = votes.postId
         ORDER BY createdAt DESC
         LIMIT ? OFFSET ?`
         , [limit, offset], // add a where after join?
@@ -340,14 +341,15 @@ module.exports = function RedditAPI(conn) {
     createOrUpdateVote: function(vote, callback){
       if (vote.vote === 1 || vote.vote === 0 || vote.vote === -1) {
         conn.query(
-          'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `vote`= ?;', [vote.vote, vote.userId, vote.postId],
+          'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE vote = ?'
+          , [vote.vote, vote.userId, vote.postId, vote.vote],
           function(err, result) {
             if (err) {
               callback(err);
             }
             else {
               conn.query(
-                'SELECT text, userId, postId FROM comments WHERE id = ?', [result.insertId],
+                'SELECT vote, userId, postId FROM votes WHERE postId = ? AND userId = ?', [vote.userId, vote.postId],
                 function(err, result) {
                   if (err) {
                     callback(err);

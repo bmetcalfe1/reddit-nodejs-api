@@ -47,7 +47,7 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-// redditAPI.getAllPostsForUser(3, {}, function(err, result){ // 3 now but its whatever you wanna pass it
+// redditAPI.getAllPostsForUser(1, {}, function(err, result){ // 3 now but its whatever you wanna pass it
 //   if (err ){
 //     console.log(err);
 //   }
@@ -120,7 +120,7 @@ var redditAPI = reddit(connection);
 // });
 
 redditAPI.createOrUpdateVote({
-  vote: 1,
+  vote: -1,
   userId: 1,
   postId: 1,
   }, function(err, result){

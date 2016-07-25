@@ -412,7 +412,7 @@ module.exports = function RedditAPI(conn) {
         FROM posts p
           JOIN users u ON p.userId = u.id
           JOIN subreddits s ON p.subredditId = s.id
-        ORDER BY createdAt
+        ORDER BY p.createdAt DESC
         LIMIT ? OFFSET ?`, [limit, offset], 
         function(err, results) {
           if (err) {

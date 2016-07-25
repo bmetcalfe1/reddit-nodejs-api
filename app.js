@@ -5,12 +5,13 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-app.get('/hello', function(request, res) {
-  res.send(<h1>Hello World!</h1>);
+// app.get('/hello', function(req, res) {
+//   res.send('<h1>Hello World!</h1>');
+// });
+
+app.get('/hello', function(req, res) {
+  res.send(`<h1>Hello ${req.query.name} </h1>`);
 });
-  
-
-
 
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */

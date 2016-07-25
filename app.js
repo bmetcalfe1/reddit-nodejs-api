@@ -77,38 +77,58 @@ var redditAPI = reddit(connection);
 // });
 
 // Exercise 4
-app.get('/posts', function(req, res) {
-  redditAPI.getFiveLatestPosts({}, function(err, result){
-    if (err){
-      res.send(err);
-    }
-    else {
-      function makeList (post) {
-        return `
-          <li class="content-item">
-            <h2 class="content-item__title">
-              <a href=${post.url}>${post.title}</a>
-            </h2>
-            <p>Created by ${post.user.username}</p>
-          </li>
-        `;
-      }
+// app.get('/posts', function(req, res) {
+//   redditAPI.getFiveLatestPosts({}, function(err, result){
+//     if (err){
+//       res.send(err);
+//     }
+//     else {
+//       function makeList (post) {
+//         return `
+//           <li class="content-item">
+//             <h2 class="content-item__title">
+//               <a href=${post.url}>${post.title}</a>
+//             </h2>
+//             <p>Created by ${post.user.username}</p>
+//           </li>
+//         `;
+//       }
           
-      var htmlMaker = `
-        <div id="contents">
-          <h1>List of contents</h1>
-          <ul class="contents-list">
-            ${result.map(function(post){
-              return makeList(post);
-            }).join("")}
-          </ul>
-        </div>  
-      `;
+//       var htmlMaker = `
+//         <div id="contents">
+//           <h1>List of contents</h1>
+//           <ul class="contents-list">
+//             ${result.map(function(post){
+//               return makeList(post);
+//             }).join("")}
+//           </ul>
+//         </div>  
+//       `;
       
-      res.send(htmlMaker);
-    }
-  });
+//       res.send(htmlMaker);
+//     }
+//   });
+// });
+
+// Exercise 5
+
+app.get('/createcontent', function(req, res) {
+
+  var damnedForm = `
+    <form action="/createContent" method="POST">
+      <div>
+        <input type="text" name="url" placeholder="Enter a URL to content">
+      </div>
+      <div>
+        <input type="text" name="title" placeholder="Enter the title of your content">
+      </div>
+      <button type="submit">Create!</button>
+    </form>
+  `;
+  
+  res.send(damnedForm);
 });
+
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
 

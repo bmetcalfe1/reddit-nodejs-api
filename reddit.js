@@ -85,7 +85,7 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-    getAllPosts: function(options, callback) {
+    getAllPosts: function(sortingMethod, options, callback) {
       // In case we are called without an options parameter, shift all the parameters manually
       if (!callback) {
         callback = options;
@@ -93,6 +93,11 @@ module.exports = function RedditAPI(conn) {
       }
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
+      
+      // do if statements here
+      if (sortingMethod === "newest") {
+        
+      }
       
       conn.query(
         `

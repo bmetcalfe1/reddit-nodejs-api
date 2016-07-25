@@ -83,7 +83,29 @@ app.get('/posts', function(req, res) {
       res.send(err);
     }
     else {
-      res.send(result);
+      function makeList (post) {
+        return `
+          <li class="content-item">
+            <h2 class="content-item__title">
+              <a href=${post.url}>${post.title}</a>
+            </h2>
+            <p>Created by ${post.user.username}</p>
+          </li>
+        `;
+      }
+          
+      var htmlMaker = `
+        <div id="contents">
+          <h1>List of contents</h1>
+          <ul class="contents-list">
+            ${result.map(function(post){
+              return makeList(post);
+            }).join("")}
+          </ul>
+        </div>  
+      `;
+      
+      res.send(htmlMaker);
     }
   });
 });

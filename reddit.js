@@ -386,6 +386,64 @@ module.exports = function RedditAPI(conn) {
         console.log("Not a valid input");
         return;
       }
-    }          
+    },
+    getFiveLatestPosts: function(options, callback) {
+      // In case we are called without an options parameter, shift all the parameters manually
+      if (!callback) {
+        callback = options;
+        options = {};
+      }
+      var limit = options.numPerPage || 5; // if options.numPerPage is "falsy" then use 25
+      var offset = (options.page || 0) * limit;
+      
+      conn.query(`
+        SELECT 
+          p.id, p.title, p.url, p.createdAt, p.updatedAt,
+          
+          u.id AS u_userId, 
+          u.username AS u_username, 
+          u.createdAt AS u_createdAt, 
+          u.updatedAt AS u_updatedAt,
+          
+          s.id AS s_id, 
+          s.name AS s_name, 
+          s.createdAt AS s_createdAt, 
+          s.updatedAt AS s_updatedAt
+        FROM posts p
+          JOIN users u ON p.userId = u.id
+          JOIN subreddits s ON p.subredditId = s.id
+        ORDER BY createdAt
+        LIMIT ? OFFSET ?`, [limit, offset], 
+        function(err, results) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            results = results.map(function(item){
+              return {
+                id: item.id,
+                title: item.title,
+                url: item.url,
+                createdAt: item.createdAt,
+                updatedAt: item.updatedAt,
+                user: {
+                  id: item.u_id,
+                  username: item.u_username,
+                  createdAt: item.u_createdAt,
+                  updatedAt: item.u_updatedAt
+                },
+                subreddit: {
+                  id: item.s_id,
+                  username: item.s_name,
+                  createdAt: item.s_createdAt,
+                  updatedAt: item.s_updatedAt
+                },
+              };
+            });
+            callback(null, results);
+          }
+        }
+      );
+    }
   };
 };

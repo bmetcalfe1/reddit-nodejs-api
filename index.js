@@ -1,6 +1,8 @@
-// our main file
-// load the mysql library
-var mysql = require('mysql');
+
+var mysql = require('mysql'); // load the mysql library
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
 
 // create a connection to our Cloud9 server
 var connection = mysql.createConnection({
@@ -38,14 +40,14 @@ var redditAPI = reddit(connection);
 //   }
 // });
 
-redditAPI.getAllPosts({}, function(err, result){
-  if (err ){
-    console.log(err);
-  }
-  else {
-    console.log(result);
-  }
-});
+// redditAPI.getAllPosts({}, function(err, result){
+//   if (err ){
+//     console.log(err);
+//   }
+//   else {
+//     console.log(result);
+//   }
+// });
 
 // redditAPI.getAllPostsForUser(1, {}, function(err, result){ // 3 now but its whatever you wanna pass it
 //   if (err ){
@@ -132,3 +134,104 @@ redditAPI.getAllPosts({}, function(err, result){
 //     }
 // });
 
+// Reddit clone -- the "full thing" edition
+
+//HOMEPAGE
+// starting with sortingmethed 'new' only. REFACTOR LATER w other sorting methods
+app.get('/homepage', function(req, res) {
+  redditAPI.getAllPosts({}, function(err, result){
+    if (err){
+      res.status(500).send('try again later');
+      console.log(err.stack);
+    }
+    else {
+    function makeList (post) {
+      return `
+        <li class="content-item">
+          <h2 class="content-item">
+            <a href=${post.url}>${post.title}</a>
+          </h2>
+          <p>Created by ${post.user.username}</p>
+        </li>
+      `;
+    }
+        
+    var htmlMaker = `
+      <div id="contents">
+        <h1>List of contents</h1>
+        <ul class="contents-list">
+          ${result.map(function(post){
+            return makeList(post);
+          }).join("")}
+        </ul>
+      </div>  
+    `;
+    
+    res.send(htmlMaker);
+    }
+  });
+});
+
+// SIGNUP PAGE
+app.get('/signup', function(req, res) {
+
+  var signupForm = `
+    <form action="/signup" method="POST">
+      <div>
+        <input type="text" name="un" placeholder="Enter a username">
+      </div>
+      <div>
+        <input type="text" name="pw" placeholder="Enter a password">
+      </div>
+      <button type="submit">Sign Up!</button>
+    </form>
+  `;
+  
+  res.send(signupForm);
+});
+
+// LOGIN PAGE
+app.get('/login', function(req, res) {
+
+  var loginForm = `
+    <form action="/login" method="POST">
+      <div>
+        <input type="text" name="un" placeholder="Enter your username">
+      </div>
+      <div>
+        <input type="text" name="pw" placeholder="Enter your password">
+      </div>
+      <button type="submit">Login!</button>
+    </form>
+  `;
+  
+  res.send(loginForm);
+});
+
+// CREATE PAGE
+app.get('/createpost', function(req, res) {
+
+  var createpostForm = `
+    <form action="/createpost" method="POST">
+      <div>
+        <input type="text" name="url" placeholder="Enter URL">
+      </div>
+      <div>
+        <input type="text" name="title" placeholder="Enter title">
+      </div>
+      <button type="submit">Post dat, bro!</button>
+    </form>
+  `;
+  
+  res.send(createpostForm);
+});
+
+/* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
+
+// Boilerplate code to start up the web server
+var server = app.listen(process.env.PORT, process.env.IP, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+
+  console.log('Example app listening at http://%s:%s', host, port);
+});

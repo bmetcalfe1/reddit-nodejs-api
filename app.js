@@ -21,70 +21,78 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // });
 
 // Exercise 1
-// app.get('/hello', function(req, res) {
-//   res.send('<h1>Hello World!</h1>');
-// });
+app.get('/hello', function(req, res) {
+  res.send('<h1>Hello World!</h1>');
+});
 
 // Exercise 2
-// app.get('/hello', function(req, res) {
-//   res.send(`<h1>Hello ${req.query.name} </h1>`);
-// });
+app.get('/hello', function(req, res) {
+  var name = req.query.name;
+  
+  if (!name){
+    res.send(`<h1>Error invalid input </h1>`);
+  }
+  else {
+    res.send(`<h1>Hello ${name} </h1>`);
+  }
+});
 
 // Exercise 3
-// app.get('/calculator/:operation', function(req, res) {
-//     var operation = req.params.operation;
-//     var add = "add";
-//     var sub = "sub";
-//     var mult = "mult";
-//     var div = "div";
-//     var num1 = req.query.num1;
-//     var num2 = req.query.num2;
+app.get('/calculator/:operation', function(req, res) {
+    var operation = req.params.operation;
+    var add = "add";
+    var sub = "sub";
+    var mult = "mult";
+    var div = "div";
+    var num1 = req.query.num1;
+    var num2 = req.query.num2;
     
-//     // do a switch when you refactor
+    // do a switch when you refactor
     
-//     if (operation === add) {
-//         res.send({
-//         "operator": operation,
-//         "firstOperand": Number(num1),
-//         "secondOperand": Number(num2),
-//         "solution": Number(num1) + Number(num2)
-//         });
-//     }
-//     else if (operation === sub) {
-//         res.send({
-//         "operator": operation,
-//         "firstOperand": Number(num1),
-//         "secondOperand": Number(num2),
-//         "solution": Number(num1) - Number(num2)
-//         });
-//     }
-//     else if (operation === mult) {
-//       res.send({
-//         "operator": operation,
-//         "firstOperand": Number(num1),
-//         "secondOperand": Number(num2),
-//         "solution": Number(num1) * Number(num2)
-//         });
-//     }
-//     else if (operation === div) {
-//       res.send({
-//         "operator": operation,
-//         "firstOperand": Number(num1),
-//         "secondOperand": Number(num2),
-//         "solution": Number(num1) / Number(num2)
-//         });
-//     }
-//     else {
-//         res.status(400).send('Bad request.');
-//     }
-// });
+    if (operation === add) {
+        res.send({
+        "operator": operation,
+        "firstOperand": Number(num1),
+        "secondOperand": Number(num2),
+        "solution": Number(num1) + Number(num2)
+        });
+    }
+    else if (operation === sub) {
+        res.send({
+        "operator": operation,
+        "firstOperand": Number(num1),
+        "secondOperand": Number(num2),
+        "solution": Number(num1) - Number(num2)
+        });
+    }
+    else if (operation === mult) {
+      res.send({
+        "operator": operation,
+        "firstOperand": Number(num1),
+        "secondOperand": Number(num2),
+        "solution": Number(num1) * Number(num2)
+        });
+    }
+    else if (operation === div) {
+      res.send({
+        "operator": operation,
+        "firstOperand": Number(num1),
+        "secondOperand": Number(num2),
+        "solution": Number(num1) / Number(num2)
+        });
+    }
+    else {
+        res.status(400).send('Bad request.');
+    }
+});
 
 // Exercise 4
 
 app.get('/posts', function(req, res) {
   redditAPI.getFiveLatestPosts({}, function(err, result){
     if (err){
-      res.send(err);
+      res.status(500).send('try again later');
+      console.log(err.stack);
     }
     else {
       function makeList (post) {

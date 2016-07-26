@@ -85,7 +85,7 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-    getAllPosts: function(sortingMethod, options, callback) {
+    getAllPosts: function(options, callback) {
       // In case we are called without an options parameter, shift all the parameters manually
       if (!callback) {
         callback = options;
@@ -94,50 +94,38 @@ module.exports = function RedditAPI(conn) {
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
       
-      // do if statements here
-      if (sortingMethod === "newest") {
-        
-      }
-      
-      conn.query(
-        `
+      conn.query(`
         SELECT 
-          posts.id AS p_id, posts.title AS p_title, posts.url AS p_url, posts.userId AS p_userId,
-          posts.createdAt AS p_createdAt, posts.updatedAt AS p_updatedAt, posts.subredditId AS p_subredditId,
-          users.id AS u_userId, users.username AS u_username, users.createdAt AS u_createdAt, users.updatedAt AS u_updatedAt,
-          subreddits.id AS s_id, subreddits.name AS s_name, subreddits.createdAt AS s_createdAt, subreddits.updatedAt AS s_updatedAt,
-          SUM (votes.vote) AS voteScore
-        FROM 
-          posts 
-        JOIN 
-          users ON posts.userId = users.id
-        JOIN 
-          subreddits ON posts.subredditId = subreddits.id
-        LEFT JOIN 
-          votes ON posts.id = votes.postId
-        GROUP BY 
-          posts.id
+          p.id, p.title, p.url, p.createdAt, p.updatedAt,
           
-        LIMIT ? OFFSET ?
-        `
-        , [limit, offset], // SUM votes.vote AS voteScore
-        // nned an order by aswell
+          u.id AS u_userId, 
+          u.username AS u_username, 
+          u.createdAt AS u_createdAt, 
+          u.updatedAt AS u_updatedAt,
+          
+          s.id AS s_id, 
+          s.name AS s_name, 
+          s.createdAt AS s_createdAt, 
+          s.updatedAt AS s_updatedAt
+        FROM posts p
+          JOIN users u ON p.userId = u.id
+          JOIN subreddits s ON p.subredditId = s.id
+        ORDER BY p.createdAt DESC
+        LIMIT ? OFFSET ?`, [limit, offset], 
         function(err, results) {
           if (err) {
             callback(err);
           }
           else {
-            var mappedReddit = results.map(function(item){
+            results = results.map(function(item){
               return {
-                
                 id: item.id,
                 title: item.title,
                 url: item.url,
                 createdAt: item.createdAt,
                 updatedAt: item.updatedAt,
-                userId: item.userId,
                 user: {
-                  id: item.u_userId,
+                  id: item.u_id,
                   username: item.u_username,
                   createdAt: item.u_createdAt,
                   updatedAt: item.u_updatedAt
@@ -148,10 +136,9 @@ module.exports = function RedditAPI(conn) {
                   createdAt: item.s_createdAt,
                   updatedAt: item.s_updatedAt
                 },
-                voteScore: item.voteScore
               };
             });
-            callback(null, mappedReddit);
+            callback(null, results);
           }
         }
       );

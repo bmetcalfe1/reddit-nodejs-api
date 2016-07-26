@@ -431,6 +431,36 @@ module.exports = function RedditAPI(conn) {
           }
         }
       );
+    },
+    checkLogin: function(user, pass, cb) {
+      conn.query('SELECT * FROM users WHERE username = ?', [user], function(err, result) {
+        if (err) {
+          console.log(err.stack);
+        }
+        else {
+          if (result.length === 0) {
+            cb(new Error('username or password incorrect')); // in this case the user does not exist
+          }
+          else {
+            var user = result[0];
+            var actualHashedPassword = user.password;
+            
+            bcrypt.compare(pass, actualHashedPassword, function(err, result) {
+              if (err) {
+                console.log(err.stack);
+              }
+              else {
+                if (result === true) { // let's be extra safe here
+                  cb(null, user);
+                }
+                else {
+                  cb(new Error('username or password incorrect')); // in this case the password is wrong, but we reply with the same error
+                }
+              }
+            });
+          }
+        }
+      });
     }
   };
 };

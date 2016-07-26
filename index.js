@@ -3,6 +3,7 @@ var mysql = require('mysql'); // load the mysql library
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 
 // create a connection to our Cloud9 server
 var connection = mysql.createConnection({
@@ -15,6 +16,7 @@ var connection = mysql.createConnection({
 // load our API and pass it the connection
 var reddit = require('./reddit');
 var redditAPI = reddit(connection);
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // It's request time!
 // redditAPI.createUser({
@@ -190,6 +192,25 @@ app.get('/signup', function(req, res) {
   res.send(signupForm);
 });
 
+app.post('/signup', function(req, res) {
+  
+  var newUser = {
+    username: req.body.un,
+    password: req.body.pw
+  };
+  
+  redditAPI.createUser(newUser, function(err, post){
+    if (err){
+      res.status(500).send('try again later'); // WHATS THE RIGHT ONE?? Error 303???
+      console.log(err.stack);
+    }
+    else {
+      res.redirect(`/login`);
+    }
+    
+  });
+});
+
 // LOGIN PAGE
 app.get('/login', function(req, res) {
 
@@ -208,6 +229,24 @@ app.get('/login', function(req, res) {
   res.send(loginForm);
 });
 
+app.post('/login', function(req, res) {
+  
+  var userCredentials = {
+    username: req.body.un,
+    password: req.body.pw
+  };
+  
+  redditAPI.checkLogin(userCredentials.username, userCredentials.password, function(err, post){
+    if (err){
+      res.status(500).send('try again later'); // WHATS THE RIGHT ONE?? Error 303???
+      console.log(err.stack);
+    }
+    else {
+      res.redirect(`/homepage`);
+    }
+  }); // for the app.post
+});
+
 // CREATE PAGE
 app.get('/createpost', function(req, res) {
 
@@ -224,6 +263,25 @@ app.get('/createpost', function(req, res) {
   `;
   
   res.send(createpostForm);
+});
+
+app.post('/createpost', function(req, res) {
+  
+  var newUser = {
+    username: req.body.username,
+    password: req.body.password
+  };
+  
+  redditAPI.createUser(newUser, function(err, post){
+    if (err){
+      res.status(500).send('try again later'); // WHATS THE RIGHT ONE??
+      console.log(err.stack);
+    }
+    else {
+      res.redirect(`/homepage`);
+    }
+    
+  });
 });
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */

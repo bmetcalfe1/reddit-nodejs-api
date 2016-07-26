@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var mysql = require('mysql');
+var bodyParser = require('body-parser');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -12,6 +13,8 @@ var connection = mysql.createConnection({
 // load our API and pass it the connection
 var reddit = require('./reddit');
 var redditAPI = reddit(connection);
+app.use(bodyParser.urlencoded({ extended: false }));
+
 
 // app.get('/', function (req, res) {
 //   res.send('Hello World!');
@@ -127,6 +130,26 @@ app.get('/createcontent', function(req, res) {
   `;
   
   res.send(damnedForm);
+});
+
+// Exercise 6
+app.post('/createcontent', function(req, res) {
+  
+  var newPost = {
+    userId: 1,
+    url: req.body.url,
+    title: req.body.title
+  };
+  
+  redditAPI.createPost(newPost, 1, function(err, post){
+    if (err){
+      console.log(err);
+    }
+    else {
+      res.send(post);
+    }
+    
+  });
 });
 
 

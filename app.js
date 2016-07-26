@@ -148,7 +148,7 @@ app.post('/createcontent', function(req, res) {
       console.log(err);
     }
     else {
-      res.redirect(`/posts/${post.id}`);
+      res.redirect(`/posts/`+ post.id);
     }
     
   });

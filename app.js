@@ -135,9 +135,6 @@ app.get('/createcontent', function(req, res) {
 
 // Exercise 6
 
-
-
-
 app.post('/createcontent', function(req, res) {
   
   var newPost = {
@@ -151,9 +148,20 @@ app.post('/createcontent', function(req, res) {
       console.log(err);
     }
     else {
-      res.redirect("/posts");
+      res.redirect(`/posts/${post.id}`);
     }
     
+  });
+});
+
+app.get('/posts/:id', function(req, res) {
+    redditAPI.getSinglePost(req.params.id, function(err, result){
+    if (err){
+      console.log(err);
+    }
+    else {
+      res.send(result);
+    }
   });
 });
 

@@ -1,6 +1,5 @@
 var bcrypt = require('bcrypt');
 var secureRandom = require('secure-random');
-var mysql = require('mysql'); // load the mysql library
 
 
 var HASH_ROUNDS = 10;
@@ -97,6 +96,7 @@ module.exports = function RedditAPI(conn) {
       }
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
+      var sorting = options.sorting || 'hotness';
       
       conn.query(`
         SELECT 
@@ -110,22 +110,32 @@ module.exports = function RedditAPI(conn) {
           s.id AS s_id, 
           s.name AS s_name, 
           s.createdAt AS s_createdAt, 
-          s.updatedAt AS s_updatedAt
+          s.updatedAt AS s_updatedAt,
+          
+          SUM(IF(vote = 1, 1, 0)) AS numUpvotes,
+          SUM(IF(vote = -1, 1, 0)) AS numDownvotes,
+          SUM(IF(vote != 0, 1, 0)) AS totalVotes,
+          SUM(vote) AS voteScore,
+          SUM(vote) / (NOW() - p.createdAt) AS hotness
+          
         FROM posts p
-          JOIN users u ON p.userId = u.id
-          JOIN subreddits s ON p.subredditId = s.id
-        ORDER BY p.createdAt DESC
-        LIMIT ? OFFSET ?`, [limit, offset], 
-        function(err, results) {
+          LEFT JOIN users u ON p.userId = u.id
+          LEFT JOIN subreddits s ON p.subredditId = s.id
+          LEFT JOIN votes v ON v.postId = p.id
+         GROUP BY p.id
+        ORDER BY ?? DESC
+        LIMIT ? OFFSET ?`, [sorting, limit, offset], 
+        function(err, posts) {
           if (err) {
             callback(err);
           }
           else {
-            results = results.map(function(item){
+            posts = posts.map(function(item){
               return {
                 id: item.id,
                 title: item.title,
                 url: item.url,
+                voteScore: item.voteScore,
                 createdAt: item.createdAt,
                 updatedAt: item.updatedAt,
                 user: {
@@ -142,7 +152,7 @@ module.exports = function RedditAPI(conn) {
                 },
               };
             });
-            callback(null, results);
+            callback(null, posts);
           }
         }
       );
@@ -348,35 +358,24 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-    createOrUpdateVote: function(vote, callback){
-      if (vote.vote === 1 || vote.vote === 0 || vote.vote === -1) {
-        conn.query(
-          'INSERT INTO votes (vote, userId, postId) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE vote = ?'
-          , [vote.vote, vote.userId, vote.postId, vote.vote],
-          function(err, result) {
-            if (err) {
-              callback(err);
-            }
-            else {
-              conn.query(
-                'SELECT vote, userId, postId FROM votes WHERE postId = ? AND userId = ?', [vote.postId, vote.userId],
-                function(err, result) {
-                  if (err) {
-                    callback(err);
-                  }
-                  else {
-                    callback(null, result[0]);
-                  }
-                }
-              );
-            }
-          }
-        );
-      }
-      else {
-        console.log("Not a valid input");
+    createOrUpdateVote: function(vote, callback) {
+      // make sure vote is +1, 0 or -1
+      if (Math.abs(vote.vote) > 1) { // is this ideal? ask ziad cuz i think this accepts 0.5
+        callback(new Error('vote has to be +1, 0 or -1'));
         return;
       }
+      
+      conn.query(
+        'INSERT INTO votes (userId, postId, vote) VALUES (?, ?, ?) ON UPDATE SET vote=?', [vote.userId, vote.postId, vote.vote, vote.vote],
+        function(err, result) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            callback(null, vote);
+          }
+        }
+      );
     },
     getFiveLatestPosts: function(options, callback) {
       // In case we are called without an options parameter, shift all the parameters manually
@@ -512,7 +511,7 @@ module.exports = function RedditAPI(conn) {
               username: user.u_username,
               createdAt: user.u_createdAt,
               updatedAt: user.u_updatedAt
-            }
+            };
             callback(null, user);
           }
         }

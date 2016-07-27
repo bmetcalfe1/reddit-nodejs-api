@@ -167,7 +167,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //HOMEPAGE
 // starting with sortingmethed 'new' only. REFACTOR LATER w other sorting methods
 app.get('/homepage', function(req, res) {
-  redditAPI.getAllPosts({}, function(err, result){
+  redditAPI.getAllPosts({
+    sorting: "hotness"
+  }, function(err, result){
     if (err){
       res.status(500).send('try again later');
       console.log(err.stack);
@@ -320,7 +322,7 @@ app.post('/createPost', function(request, response) {
         console.log(err);
       }
       else {
-        response.send("ok");  
+        response.redirect('/homepage');
       }  
     });
   }

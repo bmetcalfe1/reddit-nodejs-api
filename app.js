@@ -173,7 +173,6 @@ app.get('/posts/:id', function(req, res) {
   });
 });
 
-
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
 
 // Boilerplate code to start up the web server

@@ -1,4 +1,8 @@
 var bcrypt = require('bcrypt');
+var secureRandom = require('secure-random');
+var mysql = require('mysql'); // load the mysql library
+
+
 var HASH_ROUNDS = 10;
 
 module.exports = function RedditAPI(conn) {
@@ -458,6 +462,58 @@ module.exports = function RedditAPI(conn) {
                 }
               }
             });
+          }
+        }
+      });
+    },
+    createSession: function(userId, callback) {
+      var token = secureRandom.randomArray(100).map(code => code.toString(36)).join('');
+      conn.query('INSERT INTO sessions SET user_id = ?, token = ?', [userId, token], function(err, result) {
+        if (err) {
+          callback(err);
+        }
+        else {
+          callback(null, token); // this is the secret session token :)
+        }
+      });
+    },
+    getUserFromSession: function(token, callback) {
+      // If the cookie exists, do a database query to see if the session token belongs to a user. READ QUESTION
+      conn.query(`
+      SELECT 
+        s.session_id, 
+        s.token, 
+        
+        u.id AS u_id, 
+        u.username AS u_username, 
+        u.createdAt AS u_createdAt, 
+        u.updatedAt AS u_updatedAt
+        
+      FROM sessions s
+        LEFT JOIN users u ON s.user_id = u.id
+      WHERE token = ?
+      `, [token], function(err, user) {
+        if (err) {
+          console.log(err.stack);
+        }
+        else {
+          // do another if else
+          // then nmake an object
+          if (user.length === 0) {
+            callback(new Error('username or password incorrect'));
+          }
+          else {
+          // var tokenBeingPassed = result[0];
+          // var user = tokenBeingPassed.user_id;
+          // console.log(tokenBeingPassed);
+            user = user[0];
+            user = {
+              id: user.u_id,
+              username: user.u_username,
+              createdAt: user.u_createdAt,
+              updatedAt: user.u_updatedAt
+            }
+            callback(null, user);
           }
         }
       });

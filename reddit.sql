@@ -87,3 +87,12 @@ CREATE TABLE votes (
   FOREIGN KEY (userId) REFERENCES users (id),
   FOREIGN KEY (postId) REFERENCES posts (id)
 );
+
+CREATE TABLE `sessions` (
+  `session_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(255) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  PRIMARY KEY (`session_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+);
+

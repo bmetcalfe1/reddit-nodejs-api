@@ -9,27 +9,27 @@ app.use(cookieParser());
 app.use(checkLoginToken);
 
 function checkLoginToken (request, response, next) {
-      // check if there's a SESSION cookie...
-      if (request.cookies.SESSION) {
-        redditAPI.getUserFromSession(request.cookies.SESSION, function(err, user) {
-          if(err){
-            console.log(err);
-          }
-          else {
-            // if we get back a user object, set it on the request. 
-            // From now on, this request looks like it was made by this user as far as the rest of the code is concerned
-            if (user) {
-              request.loggedInUser = user;
-            }
-            next();
-          }
-        });
+  // check if there's a SESSION cookie...
+  if (request.cookies.SESSION) {
+    redditAPI.getUserFromSession(request.cookies.SESSION, function(err, user) {
+      if(err){
+        console.log(err);
       }
       else {
-        // if no SESSION cookie, move forward
+        // if we get back a user object, set it on the request. 
+        // From now on, this request looks like it was made by this user as far as the rest of the code is concerned
+        if (user) {
+          request.loggedInUser = user;
+        }
         next();
       }
-    }
+    });
+  }
+  else {
+    // if no SESSION cookie, move forward
+    next();
+  }
+}
 
 // create a connection to our Cloud9 server
 var connection = mysql.createConnection({
@@ -175,29 +175,58 @@ app.get('/homepage', function(req, res) {
       console.log(err.stack);
     }
     else {
-    function makeList (post) {
-      return `
-        <li class="content-item">
-          <h2 class="content-item">
-            <a href=${post.url}>${post.title}</a>
-          </h2>
-          <p>Created by ${post.user.username}</p>
-        </li>
-      `;
-    }
+      function makeList (post) {
+        return `
+          <li class="content-item">
+            <h2 class="content-item">
+              <a href=${post.url}>${post.title}</a>
+            </h2>
+            <p>Created by ${post.user.username}</p>
+            
+              <form action="/votePost" method="post">
+                <input type="hidden" name="vote" value="1">
+                <input type="hidden" name="postId" value="${post.id}">
+                <button type="submit">upvote this</button>
+              </form> 
+              <form action="/votePost" method="post" >
+                <input type="hidden" name="vote" value="-1">
+                <input type="hidden" name="postId" value="${post.id}">
+                <button type="submit">downvote this</button>
+              </form>
+              
+          </li>
+        `;
+      }
         
-    var htmlMaker = `
-      <div id="contents">
-        <h1>List of contents</h1>
-        <ul class="contents-list">
-          ${result.map(function(post){
-            return makeList(post);
-          }).join("")}
-        </ul>
-      </div>  
-    `;
+      var htmlMaker = `
+        <div id="contents">
+          <h1>List of contents</h1>
+          <ul class="contents-list">
+            ${result.map(function(post){
+              return makeList(post);
+            }).join("")}
+          </ul>
+        </div>  
+      `;
     
     res.send(htmlMaker);
+    }
+  });
+});
+
+app.post('/votePost', function(req, res) {
+  var voteObj = {
+    userId: req.loggedInUser.id,
+    postId: Number(req.body.postId),
+    vote: Number(req.body.vote)
+  };
+  redditAPI.createOrUpdateVote(voteObj, function(err, result){
+    if (err){
+      res.status(500).send('no dice');
+      console.log(err.stack);
+    }
+    else {
+      res.redirect('/homepage');
     }
   });
 });
@@ -271,7 +300,7 @@ app.post('/login', function(req, res) {
     }
     else {
       redditAPI.createSession(user.id, function(err, token) { 
-        console.log(token);
+        //console.log(token);
         if (err) {
           res.status(500).send('an error occurred. please try again later!');
         }
@@ -337,5 +366,3 @@ var server = app.listen(process.env.PORT, process.env.IP, function () {
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
-
-

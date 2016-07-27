@@ -359,14 +359,15 @@ module.exports = function RedditAPI(conn) {
       );
     },
     createOrUpdateVote: function(vote, callback) {
+      console.log(vote);
       // make sure vote is +1, 0 or -1
       if (Math.abs(vote.vote) > 1) { // is this ideal? ask ziad cuz i think this accepts 0.5
         callback(new Error('vote has to be +1, 0 or -1'));
         return;
       }
-      
+      console.log("HERE WE ARE");
       conn.query(
-        'INSERT INTO votes (userId, postId, vote) VALUES (?, ?, ?) ON UPDATE SET vote=?', [vote.userId, vote.postId, vote.vote, vote.vote],
+        'INSERT INTO votes (userId, postId, vote) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE vote=?', [vote.userId, vote.postId, vote.vote, vote.vote], // why do I have two???
         function(err, result) {
           if (err) {
             callback(err);

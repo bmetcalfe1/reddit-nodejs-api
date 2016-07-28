@@ -88,7 +88,7 @@ module.exports = function RedditAPI(conn) {
         }
       );
     },
-    getAllPosts: function(options, callback) {
+    getAllPosts: function(sortingmethod, options, callback) {
       // In case we are called without an options parameter, shift all the parameters manually
       if (!callback) {
         callback = options;
@@ -96,7 +96,7 @@ module.exports = function RedditAPI(conn) {
       }
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
-      var sorting = options.sorting || 'hotness';
+      //var sort = sortingmethod.sort || 'hotness';
       
       conn.query(`
         SELECT 
@@ -112,19 +112,18 @@ module.exports = function RedditAPI(conn) {
           s.createdAt AS s_createdAt, 
           s.updatedAt AS s_updatedAt,
           
-          SUM(IF(vote = 1, 1, 0)) AS numUpvotes,
-          SUM(IF(vote = -1, 1, 0)) AS numDownvotes,
-          SUM(IF(vote != 0, 1, 0)) AS totalVotes,
-          SUM(vote) AS voteScore,
-          SUM(vote) / (NOW() - p.createdAt) AS hotness
+          SUM(IF(vote = 1, 1, 0)) - SUM(IF(vote = -1, 1, 0)) AS top,
+          SUM(vote) / (NOW() - p.createdAt) AS hotness,
+          SUM(p.createdAt) AS new,
+          SUM(IF(vote = -1, 1, 0)) - SUM(IF(vote = 1, 1, 0)) AS controversial
           
         FROM posts p
           LEFT JOIN users u ON p.userId = u.id
           LEFT JOIN subreddits s ON p.subredditId = s.id
           LEFT JOIN votes v ON v.postId = p.id
-         GROUP BY p.id
-        ORDER BY ?? DESC
-        LIMIT ? OFFSET ?`, [sorting, limit, offset], 
+        GROUP BY p.id
+        ORDER BY ${sortingmethod} DESC
+        LIMIT ? OFFSET ?`, [limit, offset], 
         function(err, posts) {
           if (err) {
             callback(err);

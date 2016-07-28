@@ -166,10 +166,26 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //HOMEPAGE
 // starting with sortingmethed 'new' only. REFACTOR LATER w other sorting methods
-app.get('/homepage', function(req, res) {
-  redditAPI.getAllPosts({
-    sorting: "hotness"
-  }, function(err, result){
+app.get('/homepage/:sort', function(req, res) {
+  var sort = req.params.sort;
+  
+ if (sort === "top") {
+    sort = "top";
+  }
+  else if (sort === "hotness") {
+    sort = "hotness";
+  }
+  else if (sort === "new") {
+    sort = "new";
+  }
+  else if (sort === "controversial") {
+    sort = "controversial";
+  }
+  else {
+      res.status(400).send('Bad request.');
+  }
+    
+  redditAPI.getAllPosts(sort, {}, function(err, result){
     if (err){
       res.status(500).send('try again later');
       console.log(err.stack);

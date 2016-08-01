@@ -1,26 +1,43 @@
-<main>
-  <h1>List of contents</h1>
-  <ul class="contents-list">
-    <% result.forEach(function(post){ %>
-      <li class="content-item">
-    
-      <h2 class="postTitle">
-        <a href= <%= post.url %> > <%= post.title %> </a>
-      </h2>
-      <p>Created by <%= post.user.username %> </p>
-      
-        <form action="/votePost" method="post">
-          <input type="hidden" name="vote" value="1">
-          <input type="hidden" name="postId" value="<%= post.id %>">
-          <button type="submit">upvote this</button>
-        </form> 
-        <form action="/votePost" method="post" >
-          <input type="hidden" name="vote" value="-1">
-          <input type="hidden" name="postId" value="<%= post.id %>">
-          <button type="submit">downvote this</button>
-        </form>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body>
+
+  <header>
+    <% include ../partials/header %>
+  </header>
+
+  <main>
+    <h1>List of contents</h1>
+    <ul>
+      <% result.forEach(function(post){ %>
+        <li>
+          
+        <h2><a href= <%= post.url %> > <%= post.title %></a></h2>
+        <p>Created by <%= post.user.username %></p>
         
-      </li>
-    <% }) %>
-  </ul>
-</main>
+          <form action="/votePost" method="post">
+            <input type="hidden" name="vote" value="1">
+            <input type="hidden" name="postId" value="<%= post.id %>">
+            <button type="submit">upvote this</button>
+          </form> 
+          <form action="/votePost" method="post" >
+            <input type="hidden" name="vote" value="-1">
+            <input type="hidden" name="postId" value="<%= post.id %>">
+            <button type="submit">downvote this</button>
+          </form>
+          
+        </li>
+      <% }) %>
+    </ul>
+  </main>
+
+<footer>
+  <% include ../partials/footer %>
+</footer>
+    
+</body>
+</html>

@@ -1,9 +1,29 @@
-<form action="/createpost" method="POST">
-  <div>
-    <input type="text" name="url" placeholder="Enter URL">
-  </div>
-  <div>
-    <input type="text" name="title" placeholder="Enter title">
-  </div>
-  <button type="submit">Post dat, bro!</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body>
+
+  <header>
+    <% include ../partials/header %>
+  </header>
+
+  <main>
+    <form action="/createpost" method="POST">
+      <div>
+        <input type="text" name="url" placeholder="Enter URL">
+      </div>
+      <div>
+        <input type="text" name="title" placeholder="Enter title">
+      </div>
+      <button type="submit">Post dat, bro!</button>
+    </form>
+  </main>
+
+<footer>
+  <% include ../partials/footer %>
+</footer>
+    
+</body>
+</html>

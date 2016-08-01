@@ -96,7 +96,7 @@ module.exports = function RedditAPI(conn) {
       }
       var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
       var offset = (options.page || 0) * limit;
-      //var sort = sortingmethod.sort || 'hotness';
+      var sort = sortingmethod || 'hotness';
       
       conn.query(`
         SELECT 
@@ -122,7 +122,7 @@ module.exports = function RedditAPI(conn) {
           LEFT JOIN subreddits s ON p.subredditId = s.id
           LEFT JOIN votes v ON v.postId = p.id
         GROUP BY p.id
-        ORDER BY ${sortingmethod} DESC
+        ORDER BY ${sort} DESC
         LIMIT ? OFFSET ?`, [limit, offset], 
         function(err, posts) {
           if (err) {

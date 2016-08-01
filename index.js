@@ -4,6 +4,8 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+app.set('view engine', 'ejs');
+
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(checkLoginToken);
@@ -166,24 +168,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //HOMEPAGE
 // starting with sortingmethed 'new' only. REFACTOR LATER w other sorting methods
-app.get('/homepage/:sort', function(req, res) {
-  var sort = req.params.sort;
-  
- if (sort === "top") {
-    sort = "top";
-  }
-  else if (sort === "hotness") {
-    sort = "hotness";
-  }
-  else if (sort === "new") {
-    sort = "new";
-  }
-  else if (sort === "controversial") {
-    sort = "controversial";
-  }
-  else {
-      res.status(400).send('Bad request.');
-  }
+app.get('/homepage', function(req, res) {
+  var sort = req.query.sort;
     
   redditAPI.getAllPosts(sort, {}, function(err, result){
     if (err){
@@ -191,41 +177,9 @@ app.get('/homepage/:sort', function(req, res) {
       console.log(err.stack);
     }
     else {
-      function makeList (post) {
-        return `
-          <li class="content-item">
-            <h2 class="content-item">
-              <a href=${post.url}>${post.title}</a>
-            </h2>
-            <p>Created by ${post.user.username}</p>
-            
-              <form action="/votePost" method="post">
-                <input type="hidden" name="vote" value="1">
-                <input type="hidden" name="postId" value="${post.id}">
-                <button type="submit">upvote this</button>
-              </form> 
-              <form action="/votePost" method="post" >
-                <input type="hidden" name="vote" value="-1">
-                <input type="hidden" name="postId" value="${post.id}">
-                <button type="submit">downvote this</button>
-              </form>
-              
-          </li>
-        `;
-      }
-        
-      var htmlMaker = `
-        <div id="contents">
-          <h1>List of contents</h1>
-          <ul class="contents-list">
-            ${result.map(function(post){
-              return makeList(post);
-            }).join("")}
-          </ul>
-        </div>  
-      `;
-    
-    res.send(htmlMaker);
+      res.render('pages/homepage', {
+        result: result
+      });
     }
   });
 });
@@ -249,20 +203,7 @@ app.post('/votePost', function(req, res) {
 
 // SIGNUP PAGE
 app.get('/signup', function(req, res) {
-
-  var signupForm = `
-    <form action="/signup" method="POST">
-      <div>
-        <input type="text" name="un" placeholder="Enter a username">
-      </div>
-      <div>
-        <input type="text" name="pw" placeholder="Enter a password">
-      </div>
-      <button type="submit">Sign Up!</button>
-    </form>
-  `;
-  
-  res.send(signupForm);
+  res.render('pages/signup');
 });
 
 app.post('/signup', function(req, res) {
@@ -286,20 +227,7 @@ app.post('/signup', function(req, res) {
 
 // LOGIN PAGE
 app.get('/login', function(req, res) {
-
-  var loginForm = `
-    <form action="/login" method="POST">
-      <div>
-        <input type="text" name="un" placeholder="Enter your username">
-      </div>
-      <div>
-        <input type="text" name="pw" placeholder="Enter your password">
-      </div>
-      <button type="submit">Login!</button>
-    </form>
-  `;
-  
-  res.send(loginForm);
+  res.render('pages/signup');
 });
 
 app.post('/login', function(req, res) {

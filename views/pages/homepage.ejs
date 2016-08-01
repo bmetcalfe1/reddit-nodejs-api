@@ -16,7 +16,9 @@
         <li>
           
         <h2><a href= <%= post.url %> > <%= post.title %></a></h2>
-        <p>Created by <%= post.user.username %></p>
+        <p>Votescore: <%= post.voteScore %></p>
+        <p>Created by: <%= post.user.username %></p>
+        <p>Created at: <%= post.createdAt %></p>
         
           <form action="/votePost" method="post">
             <input type="hidden" name="vote" value="1">

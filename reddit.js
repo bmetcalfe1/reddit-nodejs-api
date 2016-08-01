@@ -112,6 +112,7 @@ module.exports = function RedditAPI(conn) {
           s.createdAt AS s_createdAt, 
           s.updatedAt AS s_updatedAt,
           
+          SUM(vote) AS voteScore,
           SUM(IF(vote = 1, 1, 0)) - SUM(IF(vote = -1, 1, 0)) AS top,
           SUM(vote) / (NOW() - p.createdAt) AS hotness,
           SUM(p.createdAt) AS new,
@@ -152,6 +153,7 @@ module.exports = function RedditAPI(conn) {
               };
             });
             callback(null, posts);
+            console.log(posts); // for debugging
           }
         }
       );

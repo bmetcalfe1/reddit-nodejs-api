@@ -258,21 +258,8 @@ app.post('/login', function(req, res) {
 }); // for the app.post
 
 // CREATE PAGE
-app.get('/createpost', function(req, res) {
-
-  var createpostForm = `
-    <form action="/createpost" method="POST">
-      <div>
-        <input type="text" name="url" placeholder="Enter URL">
-      </div>
-      <div>
-        <input type="text" name="title" placeholder="Enter title">
-      </div>
-      <button type="submit">Post dat, bro!</button>
-    </form>
-  `;
-  
-  res.send(createpostForm);
+app.get('/createPost', function(req, res) {
+  res.render('pages/createpost');
 });
 
 app.post('/createPost', function(request, response) {
@@ -301,8 +288,7 @@ app.post('/createPost', function(request, response) {
   }
 });
 
-/* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
-
+// YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :)
 // Boilerplate code to start up the web server
 var server = app.listen(process.env.PORT, process.env.IP, function () {
   var host = server.address().address;

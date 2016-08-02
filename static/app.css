@@ -1,3 +1,37 @@
 body {
-    size: 100%;
+    background-color: #ffcccc;
+}
+
+.allPosts li {
+    display: flex;
+    border: 1px solid black;
+    flex-direction: row;
+}
+
+.leftBox {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    flex-basis: 15%;
+    align-items: center;
+    justify-content: center;
+}
+
+.rightBox {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    flex-basis: 85%;
+    align-items: center;
+}
+
+.createdInfo {
+    display: flex;
+    flex-direction: row;
+}
+
+.createdInfo p {
+    border: 1px solid black;
+    padding-left: 10px;
+    padding-right: 10px;
 }

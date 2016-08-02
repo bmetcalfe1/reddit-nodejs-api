@@ -9,7 +9,7 @@ app.set('view engine', 'ejs');
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(checkLoginToken);
-app.use(express.static(__dirname+'/static'));
+app.use("/public", express.static(__dirname+'/static'));
 
 function checkLoginToken (request, response, next) {
   // check if there's a SESSION cookie...

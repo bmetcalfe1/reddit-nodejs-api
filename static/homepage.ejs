@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body>
+
+  <header>
+    <% include ../partials/header %>
+  </header>
+
+  <main>
+    <h1>List of Posts</h1>
+      <ul>
+        <% result.forEach(function(post){ %>
+        <div class = "allPosts">
+          <li>
+           
+          <div class = "leftBox">
+            <form action="/votePost" method="post">
+              <input type="hidden" name="vote" value="1">
+              <input type="hidden" name="postId" value="<%= post.id %>">
+              <button type="submit">upvote this</button>
+            </form> 
+            
+            <p>Votescore: <%= post.voteScore %></p>
+            
+            <form action="/votePost" method="post" >
+              <input type="hidden" name="vote" value="-1">
+              <input type="hidden" name="postId" value="<%= post.id %>">
+              <button type="submit">downvote this</button>
+            </form>
+          </div>
+          
+          <div class = "rightBox">
+            <h2><a href= <%= post.url %> > <%= post.title %></a></h2>
+            <div class = createdInfo>
+              <p>Created by: <%= post.user.username %></p>
+              <p>Created at: <%= post.createdAt %></p>
+            </div>
+          </div> 
+            
+          </li>
+        </div>
+        <% }) %>
+      </ul>
+    
+  </main>
+
+<footer>
+  <% include ../partials/footer %>
+</footer>
+    
+</body>
+</html>

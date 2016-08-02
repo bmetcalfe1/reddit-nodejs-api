@@ -35,3 +35,37 @@ body {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+h2 {
+    text-align: center;
+}
+
+input {
+    width: 20%;
+    margin: 2px;
+}
+
+.signupStyle {
+    padding: 40px;
+    text-align: center;
+}
+
+.loginStyle {
+    padding: 40px;
+    text-align: center;
+}
+
+.createpostStyle {
+    padding: 40px;
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    font-size: 14px;
+}
+
+.mainButton {
+    border: 1px solid #000;
+    background-color: #66ffcc;
+}

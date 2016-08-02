@@ -228,7 +228,7 @@ app.post('/signup', function(req, res) {
 
 // LOGIN PAGE
 app.get('/login', function(req, res) {
-  res.render('pages/signup');
+  res.render('pages/login');
 });
 
 app.post('/login', function(req, res) {

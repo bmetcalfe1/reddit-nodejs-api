@@ -203,7 +203,7 @@ app.post('/votePost', function(req, res) {
         } else {
           res.json({score: score});
         }
-      })
+      });
       //res.redirect('/homepage');
       //res.json({ok: true});
     }

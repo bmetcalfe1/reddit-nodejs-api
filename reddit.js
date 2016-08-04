@@ -529,7 +529,7 @@ module.exports = function RedditAPI(conn) {
               callback(null, result[0].voteScore);
             }
         }
-        )
+        );
     }
   };
 };

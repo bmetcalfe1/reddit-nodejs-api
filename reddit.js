@@ -153,7 +153,7 @@ module.exports = function RedditAPI(conn) {
               };
             });
             callback(null, posts);
-            console.log(posts); // for debugging
+            //console.log(posts); // for debugging
           }
         }
       );
@@ -352,7 +352,7 @@ module.exports = function RedditAPI(conn) {
               
               // do a console.log here to test
               
-              console.log(answerComments);
+              //console.log(answerComments);
             });
           }
           return callback(null, mappedReddit);
@@ -360,13 +360,13 @@ module.exports = function RedditAPI(conn) {
       );
     },
     createOrUpdateVote: function(vote, callback) {
-      console.log(vote);
+      //console.log(vote);
       // make sure vote is +1, 0 or -1
       if (Math.abs(vote.vote) > 1) { // is this ideal? ask ziad cuz i think this accepts 0.5
         callback(new Error('vote has to be +1, 0 or -1'));
         return;
       }
-      console.log("HERE WE ARE");
+      //console.log("HERE WE ARE");
       conn.query(
         'INSERT INTO votes (userId, postId, vote) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE vote=?', [vote.userId, vote.postId, vote.vote, vote.vote], // why do I have two???
         function(err, result) {
@@ -374,6 +374,7 @@ module.exports = function RedditAPI(conn) {
             callback(err);
           }
           else {
+            
             callback(null, vote);
           }
         }
@@ -518,6 +519,17 @@ module.exports = function RedditAPI(conn) {
           }
         }
       });
+    },
+    getVotesForPost: function(postId, callback){
+      conn.query(
+        `SELECT sum(vote) as voteScore from votes where postId = ?`, [postId], function(err, result) {
+            if(err){
+              callback(err);
+            } else {
+              callback(null, result[0].voteScore);
+            }
+        }
+        )
     }
   };
 };

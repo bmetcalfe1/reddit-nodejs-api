@@ -197,7 +197,15 @@ app.post('/votePost', function(req, res) {
       console.log(err.stack);
     }
     else {
-      res.redirect('/homepage');
+      redditAPI.getVotesForPost(voteObj.postId, function(err, score){
+        if(err){
+          res.json(err);
+        } else {
+          res.json({score: score});
+        }
+      })
+      //res.redirect('/homepage');
+      //res.json({ok: true});
     }
   });
 });
@@ -239,7 +247,7 @@ app.post('/login', function(req, res) {
   };
   
   redditAPI.checkLogin(userCredentials.username, userCredentials.password, function(err, user){
-    console.log(user);
+    //console.log(user);
     if (err){
       res.status(401).send(err.message);
     }
@@ -265,7 +273,7 @@ app.get('/createPost', function(req, res) {
 
 app.post('/createPost', function(request, response) {
   // before creating content, check if the user is logged in
-  console.log(request);
+  //console.log(request);
   if (!request.loggedInUser) {
     // HTTP status code 401 means Unauthorized
     response.status(401).send('You must be logged in to create content!');

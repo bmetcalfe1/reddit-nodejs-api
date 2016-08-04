@@ -17,15 +17,15 @@
           <li>
            
           <div class = "leftBox">
-            <form action="/votePost" method="post">
+            <form class="upVote" id="post_form_up_<%=post.id%>" action="/votePost" method="post">
               <input type="hidden" name="vote" value="1">
               <input type="hidden" name="postId" value="<%= post.id %>">
               <button type="submit">upvote this</button>
             </form> 
             
-            <p>Votescore: <%= post.voteScore %></p>
+            <p id='post_score_<%=post.id%>'>Votescore: <%= post.voteScore %></p>
             
-            <form action="/votePost" method="post" >
+            <form class="downVote" id="post_form_down_<%=post.id%>" action="/votePost" method="post" >
               <input type="hidden" name="vote" value="-1">
               <input type="hidden" name="postId" value="<%= post.id %>">
               <button type="submit">downvote this</button>
@@ -50,6 +50,9 @@
 <footer>
   <% include ../partials/footer %>
 </footer>
-    
+
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+    <script src='/public/main.js'></script>
 </body>
 </html>

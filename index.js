@@ -3,6 +3,9 @@ var mysql = require('mysql'); // load the mysql library
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var request = require('request');
+var cheerio = require('cheerio');
+
 
 app.set('view engine', 'ejs');
 
@@ -295,6 +298,19 @@ app.post('/createPost', function(request, response) {
       }  
     });
   }
+});
+
+// endpoint to fetch html
+
+app.get('/suggestTitle', function(req, res) {
+  var currentQueryUrl = req.query.url;
+  //console.log(currentQueryUrl);
+  request(currentQueryUrl, function(error, response, html) {
+    var $ = cheerio.load(html);
+    var myTitle = $('title').text();
+    //console.log(myTitle);
+    res.send(myTitle);
+  });
 });
 
 // YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :)

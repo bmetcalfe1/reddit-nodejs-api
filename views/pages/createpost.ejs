@@ -12,12 +12,15 @@
   <main>
     <h2>You Can Create a Post Below!</h2>
     <div class = "createpostStyle">
-    <form action="/createpost" method="POST">
+    <form class="urlForm">
       <div>
-        <input type="text" name="url" placeholder="Enter URL">
+        <input type="text" class="urlSubmit" name="url" placeholder="Enter URL">
+        <button type="submit" class="suggestButton">Suggest title</button>
       </div>
+    </form>
+    <form class="formSubmit" action="/createpost" method="POST">
       <div>
-        <input type="text" name="title" placeholder="Enter title">
+        <input type="text" class="titleSubmit" name="title" placeholder="Enter title">
       </div>
       <button type="submit" class="mainButton">Post dat, bro!</button>
     </form>
@@ -27,6 +30,7 @@
 <footer>
   <% include ../partials/footer %>
 </footer>
-    
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+    <script src='/public/createPost.js'></script>
 </body>
 </html>

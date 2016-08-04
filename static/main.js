@@ -11,10 +11,10 @@ $( document ).ready(function() {
             formInfo[inputField.name] = inputField.value;
         });
         
-        console.log(formInfo);
+        //console.log(formInfo);
         
         $.post('/votePost', formInfo, function(res){
-            console.log(res);
+            //console.log(res);
             if(res.score){
                 // var currentVote = $(`#post_score_${formInfo.postId}`).text();
                 // var score = parseInt(currentVote.substring(currentVote.indexOf(':') + 1)) + 1;
@@ -34,10 +34,10 @@ $( document ).ready(function() {
             formInfo[inputField.name] = inputField.value;
         });
         
-        console.log(formInfo);
+        //console.log(formInfo);
         
         $.post('/votePost', formInfo, function(res){
-            console.log(res);
+            //console.log(res);
             if(res.score){
                 // var currentVote = $(`#post_score_${formInfo.postId}`).text();
                 // var score = parseInt(currentVote.substring(currentVote.indexOf(':') + 1)) + 1;
